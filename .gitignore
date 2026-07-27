@@ -10,3 +10,6 @@ log/
 
 # editor / OS
 .DS_Store
+
+# SDD scratch (task briefs/reports/ledger)
+.superpowers/
