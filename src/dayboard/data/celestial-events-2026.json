@@ -1,0 +1,12 @@
+[
+  {"date": "2026-01-03", "name": "사분의자리 유성우 극대", "type": "meteor", "note": "시간당 최대 120개"},
+  {"date": "2026-03-03", "name": "개기월식", "type": "eclipse", "note": "아시아·태평양 관측 가능"},
+  {"date": "2026-04-22", "name": "거문고자리 유성우 극대", "type": "meteor", "note": ""},
+  {"date": "2026-05-06", "name": "물병자리 에타 유성우 극대", "type": "meteor", "note": ""},
+  {"date": "2026-08-12", "name": "개기일식", "type": "eclipse", "note": "유럽·북극 경로(한국 미관측)"},
+  {"date": "2026-08-13", "name": "페르세우스자리 유성우 극대", "type": "meteor", "note": "시간당 최대 60개"},
+  {"date": "2026-08-28", "name": "부분월식", "type": "eclipse", "note": ""},
+  {"date": "2026-10-21", "name": "오리온자리 유성우 극대", "type": "meteor", "note": ""},
+  {"date": "2026-11-17", "name": "사자자리 유성우 극대", "type": "meteor", "note": ""},
+  {"date": "2026-12-14", "name": "쌍둥이자리 유성우 극대", "type": "meteor", "note": "연중 최고 유성우"}
+]
