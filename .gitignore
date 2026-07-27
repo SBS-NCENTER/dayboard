@@ -1,0 +1,12 @@
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# runtime
+data/*.pid
+log/
+
+# editor / OS
+.DS_Store
