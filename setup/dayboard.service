@@ -1,0 +1,18 @@
+# setup/dayboard.service
+# systemd unit — dayboard (Flask+waitress 표출 보드).
+# Deploy: WorkingDirectory를 배포 경로로 수정 → cp → daemon-reload → enable --now.
+[Unit]
+Description=dayboard (calendar/weather/sky swipe display)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+# 배포 경로로 조정 — systemd는 줄 전체를 값으로 읽으니 인라인 '#' 주석 금지
+WorkingDirectory=/opt/dayboard
+ExecStart=/usr/bin/env bash setup/run.sh
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

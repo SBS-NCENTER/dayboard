@@ -1,0 +1,13 @@
+[hooks]
+post_install = "bash setup/install.sh"     # uv sync — server-manager u(update)가 부르는 빌드 스텝
+
+[[service]]
+name = "dayboard"
+type = "web"
+description = "달력·날씨·해/달·천체 스와이프 표출 보드 (server-manager fixture)"
+command = "bash setup/run.sh"
+host = "0.0.0.0"
+port = 20000
+health_path = "/health"
+pidfile = "data/dayboard.pid"
+autostart_service = "dayboard"
