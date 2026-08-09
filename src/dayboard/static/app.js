@@ -4,6 +4,18 @@ function esc(s) {
     .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;').replaceAll("'", '&#39;');
 }
+// 테마 (dark 기본 / light 토글, localStorage 지속)
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-btn').textContent = t === 'light' ? '☀' : '☾';
+}
+let theme = localStorage.getItem('theme') === 'light' ? 'light' : 'dark';
+applyTheme(theme);
+document.getElementById('theme-btn').onclick = () => {
+  theme = theme === 'light' ? 'dark' : 'light';
+  localStorage.setItem('theme', theme);
+  applyTheme(theme);
+};
 const PAGES = 4, REFRESH_MS = 5 * 60 * 1000;
 let idx = 0;
 const track = document.getElementById('track');
