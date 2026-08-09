@@ -1,5 +1,6 @@
 """Open-Meteo(best_match) 날씨 + 인메모리 TTL 캐시. 네트워크는 여기에만."""
 import time
+from datetime import date as _date
 
 import requests
 
@@ -28,7 +29,7 @@ def _fetch(lat: float, lon: float, tz: str) -> dict:
         "latitude": lat, "longitude": lon,
         "current": "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m",
         "daily": "temperature_2m_max,temperature_2m_min,weather_code",
-        "timezone": tz, "forecast_days": 1,
+        "timezone": tz, "forecast_days": 7,
         "wind_speed_unit": "ms",
     }
     resp = requests.get(_URL, params=params, timeout=8)
@@ -39,14 +40,24 @@ def _fetch(lat: float, lon: float, tz: str) -> dict:
 def _parse(payload: dict) -> dict:
     cur, daily = payload["current"], payload["daily"]
     code = int(cur["weather_code"])
+    times = daily["time"]
+    week = [
+        {
+            "date": times[i],
+            "weekday": _date.fromisoformat(times[i]).weekday(),  # 0=월
+            "tmax": daily["temperature_2m_max"][i],
+            "tmin": daily["temperature_2m_min"][i],
+            "code": int(daily["weather_code"][i]),
+        }
+        for i in range(len(times))
+    ]
     return {
         "temp": cur["temperature_2m"],
         "humidity": cur["relative_humidity_2m"],
         "wind": cur["wind_speed_10m"],
         "code": code,
         "label": WMO_LABELS.get(code, "정보 없음"),
-        "tmax": daily["temperature_2m_max"][0],
-        "tmin": daily["temperature_2m_min"][0],
+        "week": week,
     }
 
 
