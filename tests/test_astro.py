@@ -39,3 +39,19 @@ def test_upcoming_events_filters_and_limits(tmp_path):
 
 def test_upcoming_events_missing_file_is_empty(tmp_path):
     assert astro.upcoming_events(datetime.date(2026, 8, 1), path=tmp_path / "nope.json") == []
+
+
+def test_upcoming_events_no_limit_returns_all(tmp_path):
+    p = tmp_path / "ev.json"
+    p.write_text(
+        '[{"date":"2026-08-12","name":"a","type":"x","note":""},'
+        '{"date":"2026-09-01","name":"b","type":"x","note":""},'
+        '{"date":"2026-10-01","name":"c","type":"x","note":""},'
+        '{"date":"2026-11-01","name":"d","type":"x","note":""},'
+        '{"date":"2026-12-01","name":"e","type":"x","note":""},'
+        '{"date":"2026-12-14","name":"f","type":"x","note":""}]',
+        encoding="utf-8",
+    )
+    got = astro.upcoming_events(datetime.date(2026, 8, 1), path=p)   # n 생략 = None
+    assert len(got) == 6                                            # 상한 없음
+    assert [e["date"] for e in got][:2] == ["2026-08-12", "2026-09-01"]

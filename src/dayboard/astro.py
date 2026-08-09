@@ -35,7 +35,7 @@ def sun_moon(lat: float, lon: float, tz: str, date: datetime.date) -> dict:
     }
 
 
-def upcoming_events(today: datetime.date, n: int = 5, path: Path | None = None) -> list[dict]:
+def upcoming_events(today: datetime.date, n: int | None = None, path: Path | None = None) -> list[dict]:
     p = path or _EVENTS_PATH
     try:
         items = json.loads(p.read_text(encoding="utf-8"))
@@ -43,4 +43,4 @@ def upcoming_events(today: datetime.date, n: int = 5, path: Path | None = None) 
         return []
     upcoming = [e for e in items if e.get("date", "") >= today.isoformat()]
     upcoming.sort(key=lambda e: e["date"])
-    return upcoming[:n]
+    return upcoming if n is None else upcoming[:n]
