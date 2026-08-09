@@ -6,6 +6,7 @@ __pycache__/
 
 # runtime
 data/*.pid
+data/*.json
 log/
 
 # editor / OS

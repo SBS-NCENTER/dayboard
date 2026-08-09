@@ -127,12 +127,14 @@ document.getElementById('filter-btn').onclick = async () => {
     panel.classList.remove('hidden');
     panel.querySelectorAll('input[type=checkbox]').forEach(cb => {
       cb.onchange = async () => {
-        const hidden = [...panel.querySelectorAll('input:not(:checked)')].map(x => x.dataset.date);
-        await fetch('/api/events/hidden', {
-          method: 'POST', headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({hidden}),
-        });
-        refresh();   // /api/data 재요청 → 표출 즉시 반영
+        try {
+          const hidden = [...panel.querySelectorAll('input:not(:checked)')].map(x => x.dataset.date);
+          await fetch('/api/events/hidden', {
+            method: 'POST', headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({hidden}),
+          });
+          refresh();   // /api/data 재요청 → 표출 즉시 반영
+        } catch (e) { /* 무시 — 다음 토글에서 재시도 */ }
       };
     });
   } catch (e) { /* 무시 — 다음 시도 */ }
