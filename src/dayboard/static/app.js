@@ -17,6 +17,12 @@ document.getElementById('theme-btn').onclick = () => {
   applyTheme(theme);
 };
 const PAGES = 4, REFRESH_MS = 5 * 60 * 1000;
+const WMO_ICON = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌦️',61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'🌨️',75:'🌨️',80:'🌧️',81:'🌧️',82:'🌧️',95:'⛈️',96:'⛈️',99:'⛈️'};
+const MOON_ICON = {'신월':'🌑','초승달':'🌒','상현':'🌓','상현망간':'🌔',
+  '보름':'🌕','하현망간':'🌖','하현':'🌗','그믐달':'🌘'};
+const wmoIco = (c) => WMO_ICON[c] || '';
 let idx = 0;
 const track = document.getElementById('track');
 const dotsBox = document.getElementById('dots');
@@ -66,18 +72,28 @@ function renderCalendar(c) {
 function renderWeather(w) {
   const el = document.getElementById('wx');
   if (!w) { el.innerHTML = '<div class="err">날씨 불러오기 실패</div>'; return; }
-  el.innerHTML = `<div class="big">${Math.round(w.temp)}°</div>` +
+  const strip = (w.week || []).map(d =>
+    `<div class="wk-d"><div class="wk-day">${WD[d.weekday]}</div>` +
+    `<div class="wk-ico">${wmoIco(d.code)}</div>` +
+    `<div class="wk-t"><span class="mx">${Math.round(d.tmax)}°</span> ` +
+    `<span class="mn">${Math.round(d.tmin)}°</span></div></div>`).join('');
+  el.innerHTML =
+    `<div class="wx-now"><span class="wx-ico">${wmoIco(w.code)}</span>` +
+    `<span class="big">${Math.round(w.temp)}°</span></div>` +
     `<div class="sub">${esc(w.label)}</div>` +
-    `<div class="row"><span>최고 ${Math.round(w.tmax)}°</span><span>최저 ${Math.round(w.tmin)}°</span>` +
-    `<span>습도 ${Math.round(w.humidity)}%</span><span>바람 ${Math.round(w.wind)} m/s</span></div>`;
+    `<div class="row"><span>습도 ${Math.round(w.humidity)}%</span>` +
+    `<span>바람 ${Math.round(w.wind)} m/s</span></div>` +
+    `<div class="wk">${strip}</div>`;
 }
 function renderSunMoon(s) {
   const el = document.getElementById('sm');
   if (!s) { el.innerHTML = '<div class="err">해/달 정보 로드 실패</div>'; return; }
+  const ico = MOON_ICON[s.moon_phase] || '';
   el.innerHTML =
-    `<div class="row" style="font-size:2rem"><span>🌅 ${s.sunrise}</span><span>🌇 ${s.sunset}</span></div>` +
-    `<div class="big" style="font-size:3rem;margin-top:3vh">${s.moon_phase}</div>` +
-    `<div class="sub">달 나이 ${s.moon_age}일</div>`;
+    `<div class="sm-row">일출 ${esc(s.sunrise)} · 일몰 ${esc(s.sunset)}</div>` +
+    `<div class="moon"><span class="moon-ico">${ico}</span>` +
+    `<span><div class="big" style="font-size:2.6rem">${esc(s.moon_phase)}</div>` +
+    `<div class="sub">달 나이 ${s.moon_age}일</div></span></div>`;
 }
 function renderSky(events) {
   const el = document.getElementById('sky');
