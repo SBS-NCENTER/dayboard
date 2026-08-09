@@ -1,5 +1,6 @@
 """웹 서버 진입점: server.toml에서 host/port 읽고 waitress로 서빙."""
 import argparse
+import os
 import tomllib
 
 import waitress
@@ -33,7 +34,7 @@ def main(argv=None):
     args = ap.parse_args(argv)
 
     config.ensure_runtime_dirs()
-    pidfile.write_text(str(__import__("os").getpid()), encoding="utf-8")
+    pidfile.write_text(str(os.getpid()), encoding="utf-8")
     app = create_app()
     print(f"dayboard serving on http://{args.host}:{args.port}", flush=True)
     waitress.serve(AccessLog(app), host=args.host, port=args.port)

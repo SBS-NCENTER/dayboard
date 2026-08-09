@@ -1,4 +1,3 @@
-from pathlib import Path
 from dayboard import config
 
 
@@ -19,3 +18,4 @@ def test_load_from_file(tmp_path, monkeypatch):
     monkeypatch.setattr(config, "CONFIG_TOML", p)
     c = config.load()
     assert c.lat == 35.1 and c.label == "부산" and c.port == 20001 and c.cache_ttl == 30
+    assert c.lon == 129.0 and c.tz == "Asia/Seoul"

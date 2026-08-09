@@ -5,8 +5,7 @@ lon = 126.98
 label = "서울"
 tz = "Asia/Seoul"
 
-[server]
-port = 20000
+# server port: server.toml [[service]] 가 authoritative (config.py fallback default 20000)
 
 [weather]
 cache_ttl = 600   # Open-Meteo 응답 캐시 초

@@ -40,6 +40,8 @@ track.addEventListener('touchend', (e) => end(e.changedTouches[0].clientX));
 
 const WD = ['월', '화', '수', '목', '금', '토', '일'];
 function renderCalendar(c) {
+  const el = document.getElementById('cal');
+  if (!c) { el.innerHTML = '<div class="err">달력 로드 실패</div>'; return; }
   let h = '<div class="cal-grid">' + WD.map(w => `<div class="cal-h">${w}</div>`).join('');
   for (const wk of c.weeks) for (const cell of wk) {
     if (cell.day === null) { h += '<div class="cal-c empty"></div>'; continue; }
@@ -47,7 +49,7 @@ function renderCalendar(c) {
     h += `<div class="${cls}">${cell.day}` +
          (cell.holiday ? `<span class="cal-hol-name">${esc(cell.holiday)}</span>` : '') + '</div>';
   }
-  document.getElementById('cal').innerHTML = h + '</div>';
+  el.innerHTML = h + '</div>';
 }
 function renderWeather(w) {
   const el = document.getElementById('wx');
@@ -55,10 +57,12 @@ function renderWeather(w) {
   el.innerHTML = `<div class="big">${Math.round(w.temp)}°</div>` +
     `<div class="sub">${esc(w.label)}</div>` +
     `<div class="row"><span>최고 ${Math.round(w.tmax)}°</span><span>최저 ${Math.round(w.tmin)}°</span>` +
-    `<span>습도 ${w.humidity}%</span><span>바람 ${w.wind} m/s</span></div>`;
+    `<span>습도 ${Math.round(w.humidity)}%</span><span>바람 ${Math.round(w.wind)} m/s</span></div>`;
 }
 function renderSunMoon(s) {
-  document.getElementById('sm').innerHTML =
+  const el = document.getElementById('sm');
+  if (!s) { el.innerHTML = '<div class="err">해/달 정보 로드 실패</div>'; return; }
+  el.innerHTML =
     `<div class="row" style="font-size:2rem"><span>🌅 ${s.sunrise}</span><span>🌇 ${s.sunset}</span></div>` +
     `<div class="big" style="font-size:3rem;margin-top:3vh">${s.moon_phase}</div>` +
     `<div class="sub">달 나이 ${s.moon_age}일</div>`;
@@ -72,7 +76,9 @@ function renderSky(events) {
 }
 async function refresh() {
   try {
-    const d = await (await fetch('/api/data')).json();
+    const r = await fetch('/api/data');
+    if (!r.ok) return;
+    const d = await r.json();
     renderCalendar(d.calendar); renderWeather(d.weather);
     renderSunMoon(d.sun_moon); renderSky(d.events);
   } catch (e) { /* 네트워크 순간 실패 — 다음 폴링에서 복구 */ }

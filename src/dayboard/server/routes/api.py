@@ -7,6 +7,13 @@ from ... import astro, calendar_data, config, weather
 bp = Blueprint("api", __name__)
 
 
+def _safe(fn, fallback):
+    try:
+        return fn()
+    except Exception:
+        return fallback
+
+
 @bp.get("/api/data")
 def data():
     c = config.load()
@@ -14,8 +21,8 @@ def data():
     return jsonify({
         "location": c.label,
         "today": today.isoformat(),
-        "calendar": calendar_data.month_grid(today.year, today.month, today),
+        "calendar": _safe(lambda: calendar_data.month_grid(today.year, today.month, today), None),
         "weather": weather.get_weather(c.lat, c.lon, c.tz, ttl=c.cache_ttl),
-        "sun_moon": astro.sun_moon(c.lat, c.lon, c.tz, today),
-        "events": astro.upcoming_events(today, n=5),
+        "sun_moon": _safe(lambda: astro.sun_moon(c.lat, c.lon, c.tz, today), None),
+        "events": _safe(lambda: astro.upcoming_events(today, n=5), []),
     })
