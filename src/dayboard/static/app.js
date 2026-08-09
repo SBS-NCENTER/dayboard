@@ -16,7 +16,7 @@ document.getElementById('theme-btn').onclick = () => {
   localStorage.setItem('theme', theme);
   applyTheme(theme);
 };
-const PAGES = 4, REFRESH_MS = 5 * 60 * 1000;
+const PAGES = 3, REFRESH_MS = 5 * 60 * 1000;
 const WMO_ICON = {0:'☀️',1:'🌤️',2:'⛅',3:'☁️',45:'🌫️',48:'🌫️',
   51:'🌦️',53:'🌦️',55:'🌦️',61:'🌧️',63:'🌧️',65:'🌧️',
   71:'🌨️',73:'🌨️',75:'🌨️',80:'🌧️',81:'🌧️',82:'🌧️',95:'⛈️',96:'⛈️',99:'⛈️'};
@@ -35,7 +35,7 @@ for (let i = 0; i < PAGES; i++) {
 }
 function go(i) {
   idx = Math.max(0, Math.min(PAGES - 1, i));
-  track.style.transform = `translateX(-${idx * 25}%)`;
+  track.style.transform = `translateX(-${idx * (100 / PAGES)}%)`;
   [...dotsBox.children].forEach((d, k) => d.classList.toggle('on', k === idx));
 }
 document.addEventListener('keydown', (e) => {
