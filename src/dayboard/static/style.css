@@ -1,0 +1,32 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #0b1020; color: #e8ecf5;
+  font-family: system-ui, "Noto Sans KR", sans-serif; }
+.track { display: flex; height: 100%; width: 400%;
+  transition: transform .35s ease; touch-action: pan-y; }
+.page { width: 25%; height: 100%; flex: 0 0 25%; padding: 5vh 6vw;
+  display: flex; flex-direction: column; }
+.ttl { font-size: 2.2rem; font-weight: 700; opacity: .85; margin-bottom: 3vh; }
+.body { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+/* calendar */
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: .4rem; }
+.cal-h { text-align: center; opacity: .5; font-size: 1rem; padding: .4rem 0; }
+.cal-c { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; border-radius: .6rem; font-size: 1.4rem; }
+.cal-c.today { background: #3b6ef5; font-weight: 700; }
+.cal-c.holiday { color: #ff7a7a; }
+.cal-c.empty { opacity: .15; }
+.cal-hol-name { font-size: .7rem; opacity: .8; }
+/* weather / sunmoon / sky */
+.big { font-size: 5rem; font-weight: 700; }
+.sub { font-size: 1.6rem; opacity: .8; margin-top: 1vh; }
+.row { display: flex; gap: 2rem; font-size: 1.4rem; opacity: .8; margin-top: 2vh; }
+.ev { display: flex; justify-content: space-between; font-size: 1.5rem;
+  padding: 1.2rem 0; border-bottom: 1px solid rgba(255,255,255,.1); }
+.ev .d { opacity: .6; }
+.err { opacity: .5; font-size: 1.4rem; }
+/* dots */
+.dots { position: fixed; bottom: 3vh; left: 0; right: 0; display: flex;
+  justify-content: center; gap: .8rem; }
+.dot { width: .8rem; height: .8rem; border-radius: 50%; background: rgba(255,255,255,.25);
+  cursor: pointer; transition: background .2s; }
+.dot.on { background: #e8ecf5; }

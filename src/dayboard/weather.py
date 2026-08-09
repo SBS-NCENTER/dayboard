@@ -29,6 +29,7 @@ def _fetch(lat: float, lon: float, tz: str) -> dict:
         "current": "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m",
         "daily": "temperature_2m_max,temperature_2m_min,weather_code",
         "timezone": tz, "forecast_days": 1,
+        "wind_speed_unit": "ms",
     }
     resp = requests.get(_URL, params=params, timeout=8)
     resp.raise_for_status()
