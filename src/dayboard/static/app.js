@@ -113,3 +113,27 @@ async function refresh() {
 }
 refresh();
 setInterval(refresh, REFRESH_MS);
+// 천체 이벤트 필터 (서버 공유 상태)
+document.getElementById('filter-btn').onclick = async () => {
+  const panel = document.getElementById('filter-panel');
+  if (!panel.classList.contains('hidden')) { panel.classList.add('hidden'); return; }
+  try {
+    const evs = await (await fetch('/api/events')).json();
+    panel.innerHTML = evs.map(e =>
+      `<label class="filter-row"><input type="checkbox" data-date="${esc(e.date)}"` +
+      `${e.hidden ? '' : ' checked'}>` +
+      `<span class="fn">${esc(e.name)}</span><span class="fd">${esc(e.date)}</span></label>`
+    ).join('') || '<div class="err">이벤트 없음</div>';
+    panel.classList.remove('hidden');
+    panel.querySelectorAll('input[type=checkbox]').forEach(cb => {
+      cb.onchange = async () => {
+        const hidden = [...panel.querySelectorAll('input:not(:checked)')].map(x => x.dataset.date);
+        await fetch('/api/events/hidden', {
+          method: 'POST', headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({hidden}),
+        });
+        refresh();   // /api/data 재요청 → 표출 즉시 반영
+      };
+    });
+  } catch (e) { /* 무시 — 다음 시도 */ }
+};
