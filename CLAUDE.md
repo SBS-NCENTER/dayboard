@@ -33,6 +33,10 @@ over. Beside this file a session reads:
   record of how it was built.
 - **What was done** is `main`'s history and the issues and pull requests;
   nothing else records it.
+- **Currently live here, walked through as they come up** (workspace
+  `CLAUDE.md`): Python: the package and `uv`'s lockfile, type hints, `pytest`
+  fixtures, and what each ruff finding guards; bash: `set -euo pipefail`,
+  quoting and arrays, `trap`, and what each shellcheck finding guards.
 - **A module's docstring** states what the module holds and what reaches
   outside it (the network lives in `weather.py` alone); a document cites the
   function by `path::name`.
@@ -169,7 +173,11 @@ route around them.
   between machines: every worktree's `autoMemoryDirectory` names it, so every
   session reads the one current store, and the seat alone writes it.
   `ARCHIVE.md` there holds memories kept but not indexed: read it before
-  concluding none exists. The store's rules are `roles/seat.md`'s.
+  concluding none exists. The store's rules are `roles/seat.md`'s. Beside it,
+  `~/obsidian-vault/SBS/.claude/memory/_harness/` is the shared store of the
+  generic lessons every repository's sessions read: its index, when a lesson
+  of the kind might exist; the seat writes there what would fire in any
+  repository.
 - **Every session record lives under the session root**, a report under
   `reports/<session name>/`; the root counts only while it holds
   `.harness-session-root` (chun-harness `doc/sessions.md`).

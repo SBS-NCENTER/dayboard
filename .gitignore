@@ -13,8 +13,6 @@ log/
 # editor / OS
 .DS_Store
 
-# SDD scratch (task briefs/reports/ledger)
-.superpowers/
 
 # ---- AI-session state: the harness is tracked, the rest is not ----
 # The memory store lives under the session root, outside git. `skills/`,
