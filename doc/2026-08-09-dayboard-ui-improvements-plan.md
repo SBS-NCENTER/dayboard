@@ -54,12 +54,18 @@ tests/
 ```python
 def _fake_payload():
     return {
-        "current": {"temperature_2m": 30.4, "relative_humidity_2m": 71,
-                    "weather_code": 1, "wind_speed_10m": 5.4},
-        "daily": {"time": ["2026-08-09", "2026-08-10", "2026-08-11"],
-                  "temperature_2m_max": [30.4, 31.7, 31.5],
-                  "temperature_2m_min": [24.4, 25.0, 24.8],
-                  "weather_code": [1, 3, 51]},
+        "current": {
+            "temperature_2m": 30.4,
+            "relative_humidity_2m": 71,
+            "weather_code": 1,
+            "wind_speed_10m": 5.4,
+        },
+        "daily": {
+            "time": ["2026-08-09", "2026-08-10", "2026-08-11"],
+            "temperature_2m_max": [30.4, 31.7, 31.5],
+            "temperature_2m_min": [24.4, 25.0, 24.8],
+            "weather_code": [1, 3, 51],
+        },
     }
 
 
@@ -69,11 +75,11 @@ def test_get_weather_parses(monkeypatch):
     w = weather.get_weather(37.57, 126.98, "Asia/Seoul", ttl=600, now=0.0)
     assert w["temp"] == 30.4 and w["humidity"] == 71 and w["wind"] == 5.4
     assert w["code"] == 1 and w["label"] == "대체로 맑음"
-    assert "tmax" not in w and "tmin" not in w         # top-level 제거
+    assert "tmax" not in w and "tmin" not in w  # top-level 제거
     assert len(w["week"]) == 3
     d0 = w["week"][0]
     assert d0["date"] == "2026-08-09" and d0["tmax"] == 30.4 and d0["tmin"] == 24.4
-    assert d0["code"] == 1 and d0["weekday"] == 6      # 2026-08-09 = 일요일(6)
+    assert d0["code"] == 1 and d0["weekday"] == 6  # 2026-08-09 = 일요일(6)
 ```
 (기존 `test_cache_serves_within_ttl`·`test_failure_falls_back_to_cache_then_none`은 `_fake_payload()`를 재사용하므로 자동으로 새 구조 사용 — 그 테스트들은 temp만 보므로 수정 불필요.)
 
@@ -142,8 +148,8 @@ def test_upcoming_events_no_limit_returns_all(tmp_path):
         '{"date":"2026-12-14","name":"f","type":"x","note":""}]',
         encoding="utf-8",
     )
-    got = astro.upcoming_events(datetime.date(2026, 8, 1), path=p)   # n 생략 = None
-    assert len(got) == 6                                            # 상한 없음
+    got = astro.upcoming_events(datetime.date(2026, 8, 1), path=p)  # n 생략 = None
+    assert len(got) == 6  # 상한 없음
     assert [e["date"] for e in got][:2] == ["2026-08-12", "2026-09-01"]
 ```
 
@@ -151,11 +157,13 @@ def test_upcoming_events_no_limit_returns_all(tmp_path):
 
 - [ ] **Step 3: 구현** — `src/dayboard/astro.py` `upcoming_events` 시그니처·반환 수정:
 ```python
-def upcoming_events(today: datetime.date, n: int | None = None, path: Path | None = None) -> list[dict]:
+def upcoming_events(
+    today: datetime.date, n: int | None = None, path: Path | None = None
+) -> list[dict]:
     p = path or _EVENTS_PATH
     try:
         items = json.loads(p.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    except OSError, ValueError:
         return []
     upcoming = [e for e in items if e.get("date", "") >= today.isoformat()]
     upcoming.sort(key=lambda e: e["date"])
@@ -195,7 +203,7 @@ def test_save_load_round_trip(tmp_path, monkeypatch):
     p = tmp_path / "hidden.json"
     monkeypatch.setattr(hidden_events, "_PATH", p)
     hidden_events.save(["2026-08-12", "2026-08-28", "2026-08-12"])  # 중복 포함
-    assert hidden_events.load() == {"2026-08-12", "2026-08-28"}     # dedup
+    assert hidden_events.load() == {"2026-08-12", "2026-08-28"}  # dedup
 
 
 def test_load_corrupt_is_empty(tmp_path, monkeypatch):
@@ -210,6 +218,7 @@ def test_load_corrupt_is_empty(tmp_path, monkeypatch):
 - [ ] **Step 3: 구현** — `src/dayboard/hidden_events.py`:
 ```python
 """숨긴 천체 이벤트 date 집합 영속(data/hidden_events.json). 서버 공유 필터 상태."""
+
 import json
 
 from . import config
@@ -220,7 +229,7 @@ _PATH = config.DATA_DIR / "hidden_events.json"
 def load() -> set[str]:
     try:
         return set(json.loads(_PATH.read_text(encoding="utf-8")))
-    except (OSError, ValueError):
+    except OSError, ValueError:
         return set()
 
 
@@ -254,9 +263,14 @@ data/hidden_events.json에 숨긴 천체 이벤트 date 집합 영속(load 빈�
 def test_api_data_excludes_hidden(monkeypatch, tmp_path):
     monkeypatch.setattr(hidden_events, "_PATH", tmp_path / "h.json")
     hidden_events.save(["2026-08-12"])
-    monkeypatch.setattr(routes.api.astro, "upcoming_events",
-        lambda *a, **k: [{"date": "2026-08-12", "name": "숨김", "type": "x", "note": ""},
-                          {"date": "2026-09-01", "name": "표시", "type": "x", "note": ""}])
+    monkeypatch.setattr(
+        routes.api.astro,
+        "upcoming_events",
+        lambda *a, **k: [
+            {"date": "2026-08-12", "name": "숨김", "type": "x", "note": ""},
+            {"date": "2026-09-01", "name": "표시", "type": "x", "note": ""},
+        ],
+    )
     monkeypatch.setattr(routes.api.weather, "get_weather", lambda *a, **k: None)
     d = create_app().test_client().get("/api/data").get_json()
     dates = [e["date"] for e in d["events"]]
@@ -266,9 +280,14 @@ def test_api_data_excludes_hidden(monkeypatch, tmp_path):
 def test_api_events_lists_all_with_hidden_flag(monkeypatch, tmp_path):
     monkeypatch.setattr(hidden_events, "_PATH", tmp_path / "h.json")
     hidden_events.save(["2026-08-12"])
-    monkeypatch.setattr(routes.api.astro, "upcoming_events",
-        lambda *a, **k: [{"date": "2026-08-12", "name": "a", "type": "x", "note": ""},
-                          {"date": "2026-09-01", "name": "b", "type": "x", "note": ""}])
+    monkeypatch.setattr(
+        routes.api.astro,
+        "upcoming_events",
+        lambda *a, **k: [
+            {"date": "2026-08-12", "name": "a", "type": "x", "note": ""},
+            {"date": "2026-09-01", "name": "b", "type": "x", "note": ""},
+        ],
+    )
     r = create_app().test_client().get("/api/events").get_json()
     by_date = {e["date"]: e["hidden"] for e in r}
     assert by_date == {"2026-08-12": True, "2026-09-01": False}
@@ -276,13 +295,16 @@ def test_api_events_lists_all_with_hidden_flag(monkeypatch, tmp_path):
 
 def test_api_post_hidden_persists_and_reflects(monkeypatch, tmp_path):
     monkeypatch.setattr(hidden_events, "_PATH", tmp_path / "h.json")
-    monkeypatch.setattr(routes.api.astro, "upcoming_events",
-        lambda *a, **k: [{"date": "2026-09-01", "name": "b", "type": "x", "note": ""}])
+    monkeypatch.setattr(
+        routes.api.astro,
+        "upcoming_events",
+        lambda *a, **k: [{"date": "2026-09-01", "name": "b", "type": "x", "note": ""}],
+    )
     monkeypatch.setattr(routes.api.weather, "get_weather", lambda *a, **k: None)
     c = create_app().test_client()
     assert c.post("/api/events/hidden", json={"hidden": ["2026-09-01"]}).status_code == 200
     assert hidden_events.load() == {"2026-09-01"}
-    assert c.get("/api/data").get_json()["events"] == []   # 숨김 반영
+    assert c.get("/api/data").get_json()["events"] == []  # 숨김 반영
 
 
 def test_api_post_hidden_bad_body_400(monkeypatch, tmp_path):
@@ -318,14 +340,18 @@ def data():
     today = datetime.date.today()
     hidden = hidden_events.load()
     events = _safe(lambda: [e for e in astro.upcoming_events(today) if e["date"] not in hidden], [])
-    return jsonify({
-        "location": c.label,
-        "today": today.isoformat(),
-        "calendar": _safe(lambda: calendar_data.month_grid(today.year, today.month, today), None),
-        "weather": weather.get_weather(c.lat, c.lon, c.tz, ttl=c.cache_ttl),
-        "sun_moon": _safe(lambda: astro.sun_moon(c.lat, c.lon, c.tz, today), None),
-        "events": events,
-    })
+    return jsonify(
+        {
+            "location": c.label,
+            "today": today.isoformat(),
+            "calendar": _safe(
+                lambda: calendar_data.month_grid(today.year, today.month, today), None
+            ),
+            "weather": weather.get_weather(c.lat, c.lon, c.tz, ttl=c.cache_ttl),
+            "sun_moon": _safe(lambda: astro.sun_moon(c.lat, c.lon, c.tz, today), None),
+            "events": events,
+        }
+    )
 
 
 @bp.get("/api/events")

@@ -20,14 +20,18 @@ def data():
     today = datetime.date.today()
     hidden = hidden_events.load()
     events = _safe(lambda: [e for e in astro.upcoming_events(today) if e["date"] not in hidden], [])
-    return jsonify({
-        "location": c.label,
-        "today": today.isoformat(),
-        "calendar": _safe(lambda: calendar_data.month_grid(today.year, today.month, today), None),
-        "weather": weather.get_weather(c.lat, c.lon, c.tz, ttl=c.cache_ttl),
-        "sun_moon": _safe(lambda: astro.sun_moon(c.lat, c.lon, c.tz, today), None),
-        "events": events,
-    })
+    return jsonify(
+        {
+            "location": c.label,
+            "today": today.isoformat(),
+            "calendar": _safe(
+                lambda: calendar_data.month_grid(today.year, today.month, today), None
+            ),
+            "weather": weather.get_weather(c.lat, c.lon, c.tz, ttl=c.cache_ttl),
+            "sun_moon": _safe(lambda: astro.sun_moon(c.lat, c.lon, c.tz, today), None),
+            "events": events,
+        }
+    )
 
 
 @bp.get("/api/events")

@@ -1,9 +1,10 @@
 """설정 SSOT: config.toml 로드 + 경로 상수. cwd 비의존."""
+
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]   # src/dayboard/config.py -> repo root
+PROJECT_ROOT = Path(__file__).resolve().parents[2]  # src/dayboard/config.py -> repo root
 CONFIG_TOML = PROJECT_ROOT / "config.toml"
 DATA_DIR = PROJECT_ROOT / "data"
 
@@ -22,7 +23,11 @@ def load() -> Config:
     loc, srv, wx = {}, {}, {}
     if CONFIG_TOML.exists():
         data = tomllib.loads(CONFIG_TOML.read_text(encoding="utf-8"))
-        loc, srv, wx = data.get("location", {}), data.get("server", {}), data.get("weather", {})
+        loc, srv, wx = (
+            data.get("location", {}),
+            data.get("server", {}),
+            data.get("weather", {}),
+        )
     return Config(
         lat=float(loc.get("lat", 37.57)),
         lon=float(loc.get("lon", 126.98)),

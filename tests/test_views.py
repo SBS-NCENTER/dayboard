@@ -11,4 +11,4 @@ def test_index_served():
     c = create_app().test_client()
     r = c.get("/")
     assert r.status_code == 200
-    assert b"dayboard" in r.data.lower()   # index.html에 마커
+    assert b"dayboard" in r.data.lower()  # index.html에 마커

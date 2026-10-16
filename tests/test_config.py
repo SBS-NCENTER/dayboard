@@ -12,7 +12,7 @@ def test_load_from_file(tmp_path, monkeypatch):
     p = tmp_path / "config.toml"
     p.write_text(
         '[location]\nlat=35.1\nlon=129.0\nlabel="부산"\ntz="Asia/Seoul"\n'
-        '[server]\nport=20001\n[weather]\ncache_ttl=30\n',
+        "[server]\nport=20001\n[weather]\ncache_ttl=30\n",
         encoding="utf-8",
     )
     monkeypatch.setattr(config, "CONFIG_TOML", p)

@@ -13,7 +13,10 @@ dependencies = [
 ]
 
 [dependency-groups]
-dev = ["pytest>=8.0.0"]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.17.1",
+]
 
 [build-system]
 requires = ["hatchling"]
@@ -25,3 +28,13 @@ packages = ["src/dayboard"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+# The harness scripts under scripts/ are chun-harness's, not this project's Python.
+extend-exclude = ["scripts", ".claude"]
+
+[tool.ruff.lint]
+# The rule set the check enforces; a rule is relaxed on the one line with
+# `# noqa: <code>` and its reason beside it.
+select = ["E", "F", "W", "I", "UP", "B", "RUF"]

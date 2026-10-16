@@ -1,3 +1,4 @@
+# ---- the project's own ----
 # Python / uv
 .venv/
 __pycache__/
@@ -14,3 +15,36 @@ log/
 
 # SDD scratch (task briefs/reports/ledger)
 .superpowers/
+
+# ---- AI-session state: the harness is tracked, the rest is not ----
+# The memory store lives under the session root, outside git. `skills/`,
+# `hooks/` and `settings.json` are tracked; everything else under `.claude/`
+# is machine-specific or session state. `settings.local.json` stays ignored
+# and is the operator's switch: `disableAllHooks` there stops every hook for
+# sessions launched in that checkout.
+.claude/*
+!.claude/skills/
+!.claude/hooks/
+!.claude/settings.json
+!.claude/rules/
+CLAUDE.local.md
+
+# ---- Secrets (never commit) ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials*.json
+
+# ---- Editors, OS, bytecode ----
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+__pycache__/
+
+# Graft's context graph and its ripgrep companion, rebuilt by the tool.
+/graft
+/.ignore

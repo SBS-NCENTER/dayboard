@@ -1,11 +1,11 @@
 import datetime
-from pathlib import Path
+
 from dayboard import astro
 
 
 def test_sun_moon_deterministic():
     r = astro.sun_moon(37.57, 126.98, "Asia/Seoul", datetime.date(2026, 7, 22))
-    assert r["sunrise"] == "05:27"      # astral 3.2 실측
+    assert r["sunrise"] == "05:27"  # astral 3.2 실측
     assert r["sunset"] == "19:48"
     assert isinstance(r["moon_age"], float)
     assert r["moon_phase"] == astro.moon_phase_name(r["moon_age"])
@@ -52,6 +52,6 @@ def test_upcoming_events_no_limit_returns_all(tmp_path):
         '{"date":"2026-12-14","name":"f","type":"x","note":""}]',
         encoding="utf-8",
     )
-    got = astro.upcoming_events(datetime.date(2026, 8, 1), path=p)   # n 생략 = None
-    assert len(got) == 6                                            # 상한 없음
+    got = astro.upcoming_events(datetime.date(2026, 8, 1), path=p)  # n 생략 = None
+    assert len(got) == 6  # 상한 없음
     assert [e["date"] for e in got][:2] == ["2026-08-12", "2026-09-01"]

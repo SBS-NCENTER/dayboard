@@ -144,7 +144,7 @@ def test_load_from_file(tmp_path, monkeypatch):
     p = tmp_path / "config.toml"
     p.write_text(
         '[location]\nlat=35.1\nlon=129.0\nlabel="부산"\ntz="Asia/Seoul"\n'
-        '[server]\nport=20001\n[weather]\ncache_ttl=30\n',
+        "[server]\nport=20001\n[weather]\ncache_ttl=30\n",
         encoding="utf-8",
     )
     monkeypatch.setattr(config, "CONFIG_TOML", p)
@@ -158,11 +158,12 @@ def test_load_from_file(tmp_path, monkeypatch):
 - [ ] **Step 4: config.py 구현** — `src/dayboard/config.py`:
 ```python
 """설정 SSOT: config.toml 로드 + 경로 상수. cwd 비의존."""
+
 import tomllib
 from dataclasses import dataclass
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]   # src/dayboard/config.py -> repo root
+PROJECT_ROOT = Path(__file__).resolve().parents[2]  # src/dayboard/config.py -> repo root
 CONFIG_TOML = PROJECT_ROOT / "config.toml"
 DATA_DIR = PROJECT_ROOT / "data"
 
@@ -181,7 +182,11 @@ def load() -> Config:
     loc, srv, wx = {}, {}, {}
     if CONFIG_TOML.exists():
         data = tomllib.loads(CONFIG_TOML.read_text(encoding="utf-8"))
-        loc, srv, wx = data.get("location", {}), data.get("server", {}), data.get("weather", {})
+        loc, srv, wx = (
+            data.get("location", {}),
+            data.get("server", {}),
+            data.get("weather", {}),
+        )
     return Config(
         lat=float(loc.get("lat", 37.57)),
         lon=float(loc.get("lon", 126.98)),
@@ -223,12 +228,12 @@ from dayboard.calendar_data import month_grid
 
 
 def test_grid_marks_today_and_holiday():
-    today = datetime.date(2026, 3, 1)   # 삼일절
+    today = datetime.date(2026, 3, 1)  # 삼일절
     g = month_grid(2026, 3, today)
     assert g["year"] == 2026 and g["month"] == 3
     # 실제 날짜 셀만 모아서 검사
     cells = [c for wk in g["weeks"] for c in wk if c["day"] is not None]
-    assert len(cells) == 31                          # 3월 = 31일
+    assert len(cells) == 31  # 3월 = 31일
     mar1 = next(c for c in cells if c["day"] == 1)
     assert mar1["is_today"] is True
     assert mar1["holiday"] == "삼일절"
@@ -246,6 +251,7 @@ def test_grid_weeks_are_seven_wide():
 - [ ] **Step 3: 구현** — `src/dayboard/calendar_data.py`:
 ```python
 """이번달 그리드 + 한국 공휴일(오프라인)."""
+
 import calendar
 import datetime
 
@@ -263,12 +269,14 @@ def month_grid(year: int, month: int, today: datetime.date) -> dict:
                 row.append({"day": None, "is_today": False, "holiday": None, "weekday": wd})
             else:
                 d = datetime.date(year, month, day)
-                row.append({
-                    "day": day,
-                    "is_today": d == today,
-                    "holiday": kr.get(d),
-                    "weekday": wd,
-                })
+                row.append(
+                    {
+                        "day": day,
+                        "is_today": d == today,
+                        "holiday": kr.get(d),
+                        "weekday": wd,
+                    }
+                )
         weeks.append(row)
     return {"year": year, "month": month, "weeks": weeks}
 ```
@@ -305,7 +313,7 @@ from dayboard import astro
 
 def test_sun_moon_deterministic():
     r = astro.sun_moon(37.57, 126.98, "Asia/Seoul", datetime.date(2026, 7, 22))
-    assert r["sunrise"] == "05:27"      # astral 3.2 실측
+    assert r["sunrise"] == "05:27"  # astral 3.2 실측
     assert r["sunset"] == "19:48"
     assert isinstance(r["moon_age"], float)
     assert r["moon_phase"] == astro.moon_phase_name(r["moon_age"])
@@ -354,6 +362,7 @@ def test_upcoming_events_missing_file_is_empty(tmp_path):
 - [ ] **Step 4: astro.py 구현** — `src/dayboard/astro.py`:
 ```python
 """해·달(astral, 오프라인) + 큐레이션 천체 이벤트."""
+
 import datetime
 import json
 from pathlib import Path
@@ -366,8 +375,14 @@ _EVENTS_PATH = Path(__file__).resolve().parent / "data" / "celestial-events-2026
 
 # 달 나이(0..27.99, 삭망월 ~29.53의 astral 스케일) → 한국어 위상명
 _PHASE_BANDS = [
-    (1.84, "신월"), (5.53, "초승달"), (9.22, "상현"), (12.91, "상현망간"),
-    (16.61, "보름"), (20.30, "하현망간"), (23.99, "하현"), (27.68, "그믐달"),
+    (1.84, "신월"),
+    (5.53, "초승달"),
+    (9.22, "상현"),
+    (12.91, "상현망간"),
+    (16.61, "보름"),
+    (20.30, "하현망간"),
+    (23.99, "하현"),
+    (27.68, "그믐달"),
 ]
 
 
@@ -394,7 +409,7 @@ def upcoming_events(today: datetime.date, n: int = 5, path: Path | None = None) 
     p = path or _EVENTS_PATH
     try:
         items = json.loads(p.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
+    except OSError, ValueError:
         return []
     upcoming = [e for e in items if e.get("date", "") >= today.isoformat()]
     upcoming.sort(key=lambda e: e["date"])
@@ -432,10 +447,17 @@ from dayboard import weather
 
 def _fake_payload():
     return {
-        "current": {"temperature_2m": 30.4, "relative_humidity_2m": 71,
-                    "weather_code": 1, "wind_speed_10m": 5.4},
-        "daily": {"temperature_2m_max": [30.4], "temperature_2m_min": [24.4],
-                  "weather_code": [51]},
+        "current": {
+            "temperature_2m": 30.4,
+            "relative_humidity_2m": 71,
+            "weather_code": 1,
+            "wind_speed_10m": 5.4,
+        },
+        "daily": {
+            "temperature_2m_max": [30.4],
+            "temperature_2m_min": [24.4],
+            "weather_code": [51],
+        },
     }
 
 
@@ -451,9 +473,11 @@ def test_get_weather_parses(monkeypatch):
 def test_cache_serves_within_ttl(monkeypatch):
     weather.reset_cache()
     calls = {"n": 0}
+
     def fetch(lat, lon, tz):
         calls["n"] += 1
         return _fake_payload()
+
     monkeypatch.setattr(weather, "_fetch", fetch)
     weather.get_weather(37.57, 126.98, "Asia/Seoul", ttl=600, now=100.0)
     weather.get_weather(37.57, 126.98, "Asia/Seoul", ttl=600, now=200.0)  # TTL 내
@@ -463,12 +487,14 @@ def test_cache_serves_within_ttl(monkeypatch):
 def test_failure_falls_back_to_cache_then_none(monkeypatch):
     weather.reset_cache()
     monkeypatch.setattr(weather, "_fetch", lambda *a: _fake_payload())
-    weather.get_weather(37.57, 126.98, "Asia/Seoul", ttl=1, now=0.0)     # 캐시 채움
+    weather.get_weather(37.57, 126.98, "Asia/Seoul", ttl=1, now=0.0)  # 캐시 채움
+
     def boom(*a):
         raise RuntimeError("network down")
+
     monkeypatch.setattr(weather, "_fetch", boom)
     stale = weather.get_weather(37.57, 126.98, "Asia/Seoul", ttl=1, now=999.0)  # TTL 만료 + 실패
-    assert stale["temp"] == 30.4          # 마지막 캐시 폴백
+    assert stale["temp"] == 30.4  # 마지막 캐시 폴백
     weather.reset_cache()
     assert weather.get_weather(37.57, 126.98, "Asia/Seoul", ttl=1, now=999.0) is None
 ```
@@ -478,18 +504,33 @@ def test_failure_falls_back_to_cache_then_none(monkeypatch):
 - [ ] **Step 3: 구현** — `src/dayboard/weather.py`:
 ```python
 """Open-Meteo(best_match) 날씨 + 인메모리 TTL 캐시. 네트워크는 여기에만."""
+
 import time
 
 import requests
 
 WMO_LABELS = {
-    0: "맑음", 1: "대체로 맑음", 2: "부분적 흐림", 3: "흐림",
-    45: "안개", 48: "짙은 안개",
-    51: "약한 이슬비", 53: "이슬비", 55: "강한 이슬비",
-    61: "약한 비", 63: "비", 65: "강한 비",
-    71: "약한 눈", 73: "눈", 75: "강한 눈",
-    80: "약한 소나기", 81: "소나기", 82: "강한 소나기",
-    95: "뇌우", 96: "우박 동반 뇌우", 99: "강한 우박 뇌우",
+    0: "맑음",
+    1: "대체로 맑음",
+    2: "부분적 흐림",
+    3: "흐림",
+    45: "안개",
+    48: "짙은 안개",
+    51: "약한 이슬비",
+    53: "이슬비",
+    55: "강한 이슬비",
+    61: "약한 비",
+    63: "비",
+    65: "강한 비",
+    71: "약한 눈",
+    73: "눈",
+    75: "강한 눈",
+    80: "약한 소나기",
+    81: "소나기",
+    82: "강한 소나기",
+    95: "뇌우",
+    96: "우박 동반 뇌우",
+    99: "강한 우박 뇌우",
 }
 
 _URL = "https://api.open-meteo.com/v1/forecast"
@@ -504,10 +545,12 @@ def reset_cache() -> None:
 
 def _fetch(lat: float, lon: float, tz: str) -> dict:
     params = {
-        "latitude": lat, "longitude": lon,
+        "latitude": lat,
+        "longitude": lon,
         "current": "temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m",
         "daily": "temperature_2m_max,temperature_2m_min,weather_code",
-        "timezone": tz, "forecast_days": 1,
+        "timezone": tz,
+        "forecast_days": 1,
     }
     resp = requests.get(_URL, params=params, timeout=8)
     resp.raise_for_status()
@@ -528,7 +571,9 @@ def _parse(payload: dict) -> dict:
     }
 
 
-def get_weather(lat: float, lon: float, tz: str, ttl: int = 600, now: float | None = None) -> dict | None:
+def get_weather(
+    lat: float, lon: float, tz: str, ttl: int = 600, now: float | None = None
+) -> dict | None:
     global _cache, _cache_at
     t = time.time() if now is None else now
     if _cache is not None and (t - _cache_at) < ttl:
@@ -570,14 +615,20 @@ from dayboard.server.access_log import AccessLog
 
 def _run(environ, capsys):
     def inner(env, sr):
-        sr("200 OK", [("Content-Type", "text/plain")]); return [b"ok"]
+        sr("200 OK", [("Content-Type", "text/plain")])
+        return [b"ok"]
+
     body = b"".join(AccessLog(inner)(environ, lambda *a, **k: None))
     assert body == b"ok"
     return capsys.readouterr().out.strip()
 
 
 def test_logs_ip_method_path_status(capsys):
-    env = {"REMOTE_ADDR": "10.10.204.211", "REQUEST_METHOD": "GET", "PATH_INFO": "/api/data"}
+    env = {
+        "REMOTE_ADDR": "10.10.204.211",
+        "REQUEST_METHOD": "GET",
+        "PATH_INFO": "/api/data",
+    }
     assert _run(env, capsys) == '10.10.204.211 "GET /api/data" 200'
 
 
@@ -600,7 +651,7 @@ def test_index_served():
     c = create_app().test_client()
     r = c.get("/")
     assert r.status_code == 200
-    assert b"dayboard" in r.data.lower()   # index.html에 마커
+    assert b"dayboard" in r.data.lower()  # index.html에 마커
 ```
 `tests/test_api.py`:
 ```python
@@ -609,9 +660,19 @@ from dayboard.server.app import create_app
 
 
 def test_api_data_shape_weather_ok(monkeypatch):
-    monkeypatch.setattr(routes.api.weather, "get_weather",
-                        lambda *a, **k: {"temp": 30.4, "humidity": 71, "wind": 5.4,
-                                         "code": 1, "label": "대체로 맑음", "tmax": 30.4, "tmin": 24.4})
+    monkeypatch.setattr(
+        routes.api.weather,
+        "get_weather",
+        lambda *a, **k: {
+            "temp": 30.4,
+            "humidity": 71,
+            "wind": 5.4,
+            "code": 1,
+            "label": "대체로 맑음",
+            "tmax": 30.4,
+            "tmin": 24.4,
+        },
+    )
     c = create_app().test_client()
     d = c.get("/api/data").get_json()
     assert set(d) == {"location", "today", "calendar", "weather", "sun_moon", "events"}
@@ -623,7 +684,7 @@ def test_api_data_weather_failure_null_but_offline_panes_present(monkeypatch):
     monkeypatch.setattr(routes.api.weather, "get_weather", lambda *a, **k: None)
     c = create_app().test_client()
     d = c.get("/api/data").get_json()
-    assert d["weather"] is None                 # 상류 실패
+    assert d["weather"] is None  # 상류 실패
     assert d["calendar"]["weeks"] and d["sun_moon"]["sunset"]  # 오프라인 pane 정상
 ```
 > 주의: `test_index_served`는 T7의 `static/index.html`이 있어야 통과. T5에서는 이 테스트를 **작성만** 하고, T7 완료 후 green이 된다. T5 커밋 시엔 `-k "not test_index_served"` 로 나머지만 통과 확인하고, index 테스트는 xfail 마킹 없이 T7에서 자연 통과시킨다. (T5 구현 시 `/` 라우트는 만들되 파일이 없으면 404 → T7에서 파일 추가로 해소.)
@@ -691,18 +752,21 @@ bp = Blueprint("api", __name__)
 def data():
     c = config.load()
     today = datetime.date.today()
-    return jsonify({
-        "location": c.label,
-        "today": today.isoformat(),
-        "calendar": calendar_data.month_grid(today.year, today.month, today),
-        "weather": weather.get_weather(c.lat, c.lon, c.tz, ttl=c.cache_ttl),
-        "sun_moon": astro.sun_moon(c.lat, c.lon, c.tz, today),
-        "events": astro.upcoming_events(today, n=5),
-    })
+    return jsonify(
+        {
+            "location": c.label,
+            "today": today.isoformat(),
+            "calendar": calendar_data.month_grid(today.year, today.month, today),
+            "weather": weather.get_weather(c.lat, c.lon, c.tz, ttl=c.cache_ttl),
+            "sun_moon": astro.sun_moon(c.lat, c.lon, c.tz, today),
+            "events": astro.upcoming_events(today, n=5),
+        }
+    )
 ```
 `src/dayboard/server/app.py`:
 ```python
 """Flask App Factory."""
+
 from pathlib import Path
 
 from flask import Flask
@@ -717,6 +781,7 @@ def create_app() -> Flask:
     app = Flask(__name__, static_folder=str(_STATIC), static_url_path="/static")
     from .routes.api import bp as api_bp
     from .routes.views import bp as views_bp
+
     app.register_blueprint(views_bp)
     app.register_blueprint(api_bp)
     return app
@@ -750,7 +815,7 @@ from dayboard import serve
 
 def test_load_web_service_reads_server_toml():
     host, port, pidfile = serve._load_web_service()
-    assert port == 20000                       # server.toml
+    assert port == 20000  # server.toml
     assert str(pidfile).endswith("data/dayboard.pid")
 ```
 
@@ -776,6 +841,7 @@ autostart_service = "dayboard"
 `src/dayboard/serve.py`:
 ```python
 """웹 서버 진입점: server.toml에서 host/port 읽고 waitress로 서빙."""
+
 import argparse
 import tomllib
 

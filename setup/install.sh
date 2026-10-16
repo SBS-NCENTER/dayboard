@@ -4,7 +4,10 @@
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 root="$(cd "$here/.." && pwd)"
-command -v uv >/dev/null || { echo "ERROR: 'uv' not found. curl -LsSf https://astral.sh/uv/install.sh | sh"; exit 1; }
-( cd "$root" && uv sync )
+command -v uv >/dev/null || {
+  echo "ERROR: 'uv' not found. curl -LsSf https://astral.sh/uv/install.sh | sh"
+  exit 1
+}
+(cd "$root" && uv sync)
 "$here/firewall.sh" || true
 echo "Setup complete. Start with: setup/run.sh  (or: systemctl enable --now dayboard)"

@@ -10,7 +10,7 @@ def test_save_load_round_trip(tmp_path, monkeypatch):
     p = tmp_path / "hidden.json"
     monkeypatch.setattr(hidden_events, "_PATH", p)
     hidden_events.save(["2026-08-12", "2026-08-28", "2026-08-12"])  # 중복 포함
-    assert hidden_events.load() == {"2026-08-12", "2026-08-28"}     # dedup
+    assert hidden_events.load() == {"2026-08-12", "2026-08-28"}  # dedup
 
 
 def test_load_corrupt_is_empty(tmp_path, monkeypatch):

@@ -1,4 +1,5 @@
 """웹 서버 진입점: server.toml에서 host/port 읽고 waitress로 서빙."""
+
 import argparse
 import os
 import tomllib
