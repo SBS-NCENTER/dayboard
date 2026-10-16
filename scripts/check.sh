@@ -22,11 +22,12 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-# A script is a tracked file whose first line is a bash or sh shebang; a
-# shebang quoted inside a document does not count.
+# A script is a tracked file whose first line is a bash, sh or dash shebang;
+# zsh is not shellcheck's, and a shebang quoted inside a document does not
+# count.
 scripts=()
 while IFS= read -r -d '' f; do
-  if [[ $(head -n 1 -- "$f" 2>/dev/null) =~ ^#!.*(ba)?sh([[:space:]]|$) ]]; then scripts+=("$f"); fi
+  if [[ $(head -n 1 -- "$f" 2>/dev/null | tr -d "\0") =~ ^#!(/[^[:space:]]*/|[[:space:]]*/usr/bin/env[[:space:]]+)(ba|da)?sh([[:space:]]|$) ]]; then scripts+=("$f"); fi
 done < <(git ls-files -z | sort -z)
 echo "shellcheck: ${#scripts[@]} scripts"
 if [ "${#scripts[@]}" -gt 0 ]; then

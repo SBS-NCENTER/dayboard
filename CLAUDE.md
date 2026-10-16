@@ -140,9 +140,9 @@ route around them.
 ## Host notes
 
 - `chunbay-x86`: the sessions' host. The worktrees are
-  `~/workspaces/SBS/dayboard` (the primary, on `production`),
-  `dayboard-seat`, `dayboard-lane-a` and `dayboard-lane-b` beside it; the
-  session root is `~/workspaces/SBS/draft/dayboard` and the memory store
+  `~/workspaces/SBS/dayboard/production` (the primary, on `production`),
+  `seat`, `lane-a` and `lane-b` beside it in that folder; the session root is
+  `~/workspaces/SBS/dayboard/draft` and the memory store
   `~/obsidian-vault/SBS/.claude/memory/dayboard/`, both named in each
   worktree's `.claude/settings.local.json` (chun-harness
   `templates/settings.local.example.json`).
